@@ -1,0 +1,11 @@
+{
+  "name": "azuria",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:gzordrai/azuria.git",
+  "author": "gzordrai <40698142+gzordrai@users.noreply.github.com>",
+  "license": "MIT",
+  "dependencies": {
+    "discord.js": "^14.14.1"
+  }
+}
