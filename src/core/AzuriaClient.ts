@@ -1,7 +1,9 @@
 import { Client, ClientOptions } from "discord.js";
 import { createLogger, format, Logger, transports } from "winston";
-import { ClientUtils } from "../utils/ClientUtils";
+import { resolve } from "path";
 import { CommandManager, ConfigManager,  EventManager } from "./managers";
+import { ApiUrlNotDefinedError, TokenNotDefinedError } from "./errors";
+import { ClientUtils } from "../utils/ClientUtils";
 
 /**
  * `AzuriaClient` is a class that extends the `Client` class from `discord.js`.
@@ -16,9 +18,10 @@ import { CommandManager, ConfigManager,  EventManager } from "./managers";
  */
 export class AzuriaClient extends Client {
     public readonly apiURL: string;
+    public readonly baseDir: string;
     public readonly config: ConfigManager = new ConfigManager(this);
-    public readonly commands: CommandManager = new CommandManager(this, "./src/commands");
-    public readonly events: EventManager = new EventManager(this, "./src/events");
+    public readonly commands: CommandManager;
+    public readonly events: EventManager;
     public readonly logger: Logger;
     public readonly utils: ClientUtils = new ClientUtils();
 
@@ -27,17 +30,25 @@ export class AzuriaClient extends Client {
      *
      * @param {ClientOptions} options - The options for the `Client`.
      */
-    public constructor(options: ClientOptions, apiURL: string) {
+    public constructor(options: ClientOptions, baseDir: string) {
         super(options);
 
-        this.apiURL = apiURL;
+        if (process.env.TOKEN === undefined)
+            throw new TokenNotDefinedError();
+
+        if (process.env.API_URL === undefined)
+            throw new ApiUrlNotDefinedError();
+
+        this.apiURL = process.env.API_URL;
+        this.baseDir = baseDir;
+        this.commands = new CommandManager(this, resolve(this.baseDir, "./commands"));
+        this.events = new EventManager(this, resolve(this.baseDir, "./events"));
         this.logger = createLogger({
             format: format.combine(
                 format.timestamp(),
                 format.json()
             ),
             transports: [
-                new transports.Console(),
                 new transports.File({ filename: "combined.log" })
             ]
         });
@@ -50,9 +61,9 @@ export class AzuriaClient extends Client {
      * @public
      * @returns {Promise<void>}
      */
-    public async start(token: string): Promise<void> {
+    public async start(): Promise<void> {
         this.events.load();
-        this.login(token)
+        this.login(process.env.TOKEN)
         .then(async () => {
             this.logger.info("Logged in successfully.");
 
