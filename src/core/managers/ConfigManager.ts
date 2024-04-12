@@ -1,11 +1,11 @@
 import axios from "axios";
 import { IConfig } from "../interfaces";
-import { Azuria } from "../Azuria";
+import { AzuriaClient } from "../AzuriaClient";
 import { io, Socket } from "socket.io-client";
-import { apiUrl, token } from "../../config/env";
+import { Collection } from "discord.js";
 
 /**
- * `ConfigManager` is a class responsible for fetching and managing the configuration for the `Azuria` client.
+ * `ConfigManager` is a class responsible for fetching and managing the configuration for the `AzuriaClient` client.
  * It fetches the configuration from a specified URL and stores it in the `config` property.
  *
  * @example
@@ -14,26 +14,22 @@ import { apiUrl, token } from "../../config/env";
  *
  * @class
  */
-export class ConfigManager {
-    private client: Azuria;
+export class ConfigManager extends Collection<string, any> {
+    private client: AzuriaClient;
     private socket: Socket;
     private config: IConfig;
-
-    public readonly apiUrl: string;
-    public readonly token: string;
 
     /**
      * Creates an instance of `ConfigManager`.
      *
-     * @param {Azuria} client - The client instance for which the configuration will be managed.
+     * @param {AzuriaClient} client - The client instance for which the configuration will be managed.
      */
-    public constructor(client: Azuria) {
-        this.client = client;
-        this.socket = io("http://localhost:3000");
-        this.config = {};
+    public constructor(client: AzuriaClient) {
+        super();
 
-        this.apiUrl = apiUrl!;
-        this.token = token!;
+        this.client = client;
+        this.socket = io(this.client.apiURL);
+        this.config = {};
     }
 
     /**
@@ -77,7 +73,7 @@ export class ConfigManager {
         this.client.logger.info("Fetching config...");
 
         try {
-            const response = await axios.get("http://localhost:3000/config");
+            const response = await axios.get(`${this.client.apiURL}/bot/${this.client.user?.id}/configs`);
             this.config = response.data;
 
             this.client.logger.info("Config fetched !");

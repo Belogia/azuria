@@ -1,9 +1,9 @@
-import { Azuria } from "./Azuria";
+import { AzuriaClient } from "./AzuriaClient";
 import { IEvent } from "./interfaces/";
 
 /**
  * `BaseEvent` is an abstract class that implements the `IEvent` interface.
- * It serves as a base for all event classes in the `Azuria` client.
+ * It serves as a base for all event classes in the `AzuriaClient` client.
  * Each event class that extends `BaseEvent` must implement the `execute` method.
  *
  * @example
@@ -17,16 +17,16 @@ import { IEvent } from "./interfaces/";
  * @implements {IEvent}
  */
 export abstract class BaseEvent implements IEvent {
-    protected client: Azuria;
+    protected client: AzuriaClient;
     public readonly name: IEvent["name"];
 
     /**
      * Creates an instance of `BaseEvent`.
      *
-     * @param {Azuria} client - The client instance associated with the event.
+     * @param {AzuriaClient} client - The client instance associated with the event.
      * @param {IEvent["name"]} name - The name of the event.
      */
-    public constructor(client: Azuria, name: IEvent["name"]) {
+    public constructor(client: AzuriaClient, name: IEvent["name"]) {
         this.client = client;
         this.name = name;
     };

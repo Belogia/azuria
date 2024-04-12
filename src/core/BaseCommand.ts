@@ -1,10 +1,10 @@
 import { ApplicationCommandData } from "discord.js";
-import { Azuria } from "./Azuria";
+import { AzuriaClient } from "./AzuriaClient";
 import { ICommand } from "./interfaces";
 
 /**
  * `BaseCommand` is an abstract class that implements the `ICommand` interface.
- * It provides a base structure for creating new commands for the `Azuria` client.
+ * It provides a base structure for creating new commands for the `AzuriaClient` client.
  * Each command must implement the `execute` method.
  *
  * @example
@@ -19,16 +19,16 @@ import { ICommand } from "./interfaces";
  * @implements {ICommand}
  */
 export abstract class BaseCommand implements ICommand {
-    protected client: Azuria;
+    protected client: AzuriaClient;
     public readonly data: ApplicationCommandData;
 
     /**
      * Creates an instance of `BaseCommand`.
      *
-     * @param {Azuria} client - The client instance to which the command will be attached.
+     * @param {AzuriaClient} client - The client instance to which the command will be attached.
      * @param {ApplicationCommandData} data - The data for the command.
      */
-    public constructor(client: Azuria, data: ApplicationCommandData) {
+    public constructor(client: AzuriaClient, data: ApplicationCommandData) {
         this.client = client;
         this.data = data;
     };

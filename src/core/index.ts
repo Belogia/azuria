@@ -1,4 +1,4 @@
 export * from "./decorators";
-export * from "./Azuria";
+export * from "./AzuriaClient";
 export * from "./BaseCommand";
 export * from "./BaseEvent";

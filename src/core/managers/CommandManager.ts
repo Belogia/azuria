@@ -1,11 +1,12 @@
 import { ApplicationCommandData, Collection } from "discord.js";
 import { readdir } from "fs/promises";
 import { resolve } from "path";
-import { Azuria } from "../Azuria";
+import { AzuriaClient } from "../AzuriaClient";
 import { ICommand } from "../interfaces";
+import { pathToFileURL } from "url";
 
 /**
- * `CommandManager` is a class responsible for loading and managing command files for the `Azuria` client.
+ * `CommandManager` is a class responsible for loading and managing command files for the `AzuriaClient` client.
  * It reads the command files from a specified directory, imports them, and attaches them to the client.
  *
  * @example
@@ -16,17 +17,17 @@ import { ICommand } from "../interfaces";
  * @extends {Collection<string, ICommand>}
  */
 export class CommandManager extends Collection<string, ICommand> {
-    private client: Azuria;
+    private client: AzuriaClient;
     private readonly path: string;
     public readonly categories: Collection<string, any> = new Collection<string, any>();
 
     /**
      * Creates an instance of `CommandManager`.
      *
-     * @param {Azuria} client - The client instance to which the commands will be attached.
+     * @param {AzuriaClient} client - The client instance to which the commands will be attached.
      * @param {string} path - The path to the directory containing the command files.
      */
-    public constructor(client: Azuria, path: string) {
+    public constructor(client: AzuriaClient, path: string) {
         super();
 
         this.client = client;
@@ -51,7 +52,7 @@ export class CommandManager extends Collection<string, ICommand> {
             this.client.logger.info(`Found ${files.length} of commands in ${category}, loading...`);
 
             for (const file of files) {
-                const path = resolve(this.path, category, file);
+                const path = pathToFileURL(resolve(this.path, category, file)).href;
                 const command = await this.client.utils.import<ICommand>(path, this.client);
 
                 if (command === undefined) throw new Error(`File ${file} is not a valid command file.`);
