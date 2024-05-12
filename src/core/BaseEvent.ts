@@ -16,9 +16,9 @@ import { IEvent } from "./interfaces/";
  * @class
  * @implements {IEvent}
  */
-export abstract class BaseEvent implements IEvent {
-    protected client: AzuriaClient;
-    public readonly name: IEvent["name"];
+export abstract class BaseEvent<T> implements IEvent<T> {
+    public readonly client: AzuriaClient<T>;
+    public readonly name: IEvent<T>["name"];
 
     /**
      * Creates an instance of `BaseEvent`.
@@ -26,7 +26,7 @@ export abstract class BaseEvent implements IEvent {
      * @param {AzuriaClient} client - The client instance associated with the event.
      * @param {IEvent["name"]} name - The name of the event.
      */
-    public constructor(client: AzuriaClient, name: IEvent["name"]) {
+    public constructor(client: AzuriaClient<T>, name: IEvent<T>["name"]) {
         this.client = client;
         this.name = name;
     };

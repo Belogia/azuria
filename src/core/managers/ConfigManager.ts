@@ -1,8 +1,7 @@
 import axios from "axios";
-import { IConfig } from "../interfaces";
 import { AzuriaClient } from "../AzuriaClient";
 import { io, Socket } from "socket.io-client";
-import { Collection } from "discord.js";
+import { Collection, Snowflake } from "discord.js";
 
 /**
  * `ConfigManager` is a class responsible for fetching and managing the configuration for the `AzuriaClient` client.
@@ -14,22 +13,20 @@ import { Collection } from "discord.js";
  *
  * @class
  */
-export class ConfigManager extends Collection<string, any> {
-    private client: AzuriaClient;
+export class ConfigManager<T> extends Collection<Snowflake, T> {
+    private client: AzuriaClient<T>;
     private socket: Socket;
-    private config: IConfig;
 
     /**
      * Creates an instance of `ConfigManager`.
      *
      * @param {AzuriaClient} client - The client instance for which the configuration will be managed.
      */
-    public constructor(client: AzuriaClient) {
+    public constructor(client: AzuriaClient<T>) {
         super();
 
         this.client = client;
-        this.socket = io(this.client.apiURL);
-        this.config = {};
+        this.socket = io(""); // todo
     }
 
     /**
@@ -53,6 +50,8 @@ export class ConfigManager extends Collection<string, any> {
 
                 this.client.logger.info("Config updated !");
             });
+
+            await this.fetchConfig();
         } else {
             this.client.logger.error("Client is not ready yet !");
             throw new Error("Client is not ready yet");
@@ -73,13 +72,21 @@ export class ConfigManager extends Collection<string, any> {
         this.client.logger.info("Fetching config...");
 
         try {
-            const response = await axios.get(`${this.client.apiURL}/bot/${this.client.user?.id}/configs`);
-            this.config = response.data;
+            const response = await axios.get(`https://www.api.belogia.fr/api/v1/bots/${this.client.user?.id}/configs`, {
+                headers: {
+                    Authorization: `Bearer ${this.client.apiKey}`,
+                    "Accept-Encoding": "application/x-www-form-urlencoded",
+                    "Content-Type": "application/x-www-form-urlencoded",
+                }
+            });
+
+            response.data.forEach((config: { guild: Snowflake, guildConfig: T }) => {
+                this.set(config.guild, config.guildConfig);
+            });
 
             this.client.logger.info("Config fetched !");
         } catch (error) {
             this.client.logger.error("An error occured while fetching the config !");
-            throw new Error("An error occured while fetching the config !");
         }
     }
 }

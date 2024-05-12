@@ -15,8 +15,8 @@ import { pathToFileURL } from "url";
  *
  * @class
  */
-export class EventManager {
-    private client: AzuriaClient;
+export class EventManager<T> {
+    private client: AzuriaClient<T>;
     private path: string;
 
     /**
@@ -25,7 +25,7 @@ export class EventManager {
      * @param {AzuriaClient} client - The client instance to which the events will be attached.
      * @param {string} path - The path to the directory containing the event files.
      */
-    public constructor(client: AzuriaClient, path: string) {
+    public constructor(client: AzuriaClient<T>, path: string) {
         this.client = client;
         this.path = path;
     };
@@ -40,7 +40,7 @@ export class EventManager {
                 this.client.logger.info(`Loading ${files.length} events...`);
 
                 for (const file of files) {
-                    const event = await this.client.utils.import<IEvent>(pathToFileURL(resolve(this.path, file)).href, this.client);
+                    const event = await this.client.utils.import<IEvent<T>>(pathToFileURL(resolve(this.path, file)).href, this.client);
 
                     if (event === undefined) throw new Error(`File ${file} is not a valid event file.`);
 

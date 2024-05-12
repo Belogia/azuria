@@ -18,8 +18,8 @@ import { ICommand } from "./interfaces";
  * @class
  * @implements {ICommand}
  */
-export abstract class BaseCommand implements ICommand {
-    protected client: AzuriaClient;
+export abstract class BaseCommand<T> implements ICommand<T> {
+    public readonly client: AzuriaClient<T>;
     public readonly data: ApplicationCommandData;
 
     /**
@@ -28,7 +28,7 @@ export abstract class BaseCommand implements ICommand {
      * @param {AzuriaClient} client - The client instance to which the command will be attached.
      * @param {ApplicationCommandData} data - The data for the command.
      */
-    public constructor(client: AzuriaClient, data: ApplicationCommandData) {
+    public constructor(client: AzuriaClient<T>, data: ApplicationCommandData) {
         this.client = client;
         this.data = data;
     };

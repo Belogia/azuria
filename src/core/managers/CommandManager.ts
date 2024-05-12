@@ -16,8 +16,8 @@ import { pathToFileURL } from "url";
  * @class
  * @extends {Collection<string, ICommand>}
  */
-export class CommandManager extends Collection<string, ICommand> {
-    private client: AzuriaClient;
+export class CommandManager<T> extends Collection<string, ICommand<T>> {
+    private client: AzuriaClient<T>;
     private readonly path: string;
     public readonly categories: Collection<string, any> = new Collection<string, any>();
 
@@ -27,7 +27,7 @@ export class CommandManager extends Collection<string, ICommand> {
      * @param {AzuriaClient} client - The client instance to which the commands will be attached.
      * @param {string} path - The path to the directory containing the command files.
      */
-    public constructor(client: AzuriaClient, path: string) {
+    public constructor(client: AzuriaClient<T>, path: string) {
         super();
 
         this.client = client;
@@ -53,7 +53,7 @@ export class CommandManager extends Collection<string, ICommand> {
 
             for (const file of files) {
                 const path = pathToFileURL(resolve(this.path, category, file)).href;
-                const command = await this.client.utils.import<ICommand>(path, this.client);
+                const command = await this.client.utils.import<ICommand<T>>(path, this.client);
 
                 if (command === undefined) throw new Error(`File ${file} is not a valid command file.`);
 

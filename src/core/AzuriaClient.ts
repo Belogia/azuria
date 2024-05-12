@@ -10,7 +10,7 @@ import { ClientUtils } from "../utils/ClientUtils";
  * It includes additional properties for managing configuration, commands, and events, as well as a logger and utility methods.
  *
  * @example
- * const client = new AzuriaClient({
+ * const client = new AzuriaClient<MyBotConfig>({
  *      apiKey: process.env.API_TOKEN,
  *      baseDir: __dirname,
  *      intents: [...],
@@ -25,11 +25,11 @@ import { ClientUtils } from "../utils/ClientUtils";
  * @class
  * @extends {Client}
  */
-export class AzuriaClient extends Client {
+export class AzuriaClient<T = any> extends Client {
     public readonly apiKey: string;
-    public readonly config: ConfigManager = new ConfigManager(this);
-    public readonly commands: CommandManager;
-    public readonly events: EventManager;
+    public readonly configs: ConfigManager<T>;
+    public readonly commands: CommandManager<T>;
+    public readonly events: EventManager<T>;
     public readonly logger: Logger;
     public readonly utils: ClientUtils = new ClientUtils();
 
@@ -42,6 +42,7 @@ export class AzuriaClient extends Client {
         super(options);
 
         this.apiKey = options.apiKey;
+        this.configs = new ConfigManager(this)
         this.commands = new CommandManager(this, resolve(options.baseDir, "./commands"));
         this.events = new EventManager(this, resolve(options.baseDir, "./events"));
         this.logger = createLogger(options.loggerOptions);
@@ -61,7 +62,7 @@ export class AzuriaClient extends Client {
             .then(async () => {
                 this.logger.info("Logged in successfully.");
 
-                await this.config.load();
+                await this.configs.load();
                 await this.commands.load();
             })
             .catch((error) => this.logger.error("CLIENT_START_ERR:", error))
