@@ -1,8 +1,8 @@
-import { Client, ClientOptions } from "discord.js";
-import { createLogger, format, Logger, transports } from "winston";
+import { Client } from "discord.js";
+import { createLogger, Logger } from "winston";
 import { resolve } from "path";
-import { CommandManager, ConfigManager,  EventManager } from "./managers";
-import { ApiUrlNotDefinedError, TokenNotDefinedError } from "./errors";
+import { IAzuriaClientOptions } from "./interfaces/";
+import { CommandManager, ConfigManager, EventManager } from "./managers";
 import { ClientUtils } from "../utils/ClientUtils";
 
 /**
@@ -10,15 +10,23 @@ import { ClientUtils } from "../utils/ClientUtils";
  * It includes additional properties for managing configuration, commands, and events, as well as a logger and utility methods.
  *
  * @example
- * const client = new AzuriaClient({ intents: ['GUILD_MESSAGES', 'GUILD_MEMBERS'] });
+ * const client = new AzuriaClient({
+ *      apiKey: process.env.API_TOKEN,
+ *      baseDir: __dirname,
+ *      intents: [...],
+ *      partials: [...],
+ *      loggerOptions: {
+ *          ...
+ *      }
+ * });
+ * 
  * client.start();
  *
  * @class
  * @extends {Client}
  */
 export class AzuriaClient extends Client {
-    public readonly apiURL: string;
-    public readonly baseDir: string;
+    public readonly apiKey: string;
     public readonly config: ConfigManager = new ConfigManager(this);
     public readonly commands: CommandManager;
     public readonly events: EventManager;
@@ -28,30 +36,15 @@ export class AzuriaClient extends Client {
     /**
      * Creates an instance of `AzuriaClient`.
      *
-     * @param {ClientOptions} options - The options for the `Client`.
+     * @param {AzuriaClientOptions} options - The options for the `Client`.
      */
-    public constructor(options: ClientOptions, baseDir: string) {
+    public constructor(options: IAzuriaClientOptions) {
         super(options);
 
-        if (process.env.TOKEN === undefined)
-            throw new TokenNotDefinedError();
-
-        if (process.env.API_URL === undefined)
-            throw new ApiUrlNotDefinedError();
-
-        this.apiURL = process.env.API_URL;
-        this.baseDir = baseDir;
-        this.commands = new CommandManager(this, resolve(this.baseDir, "./commands"));
-        this.events = new EventManager(this, resolve(this.baseDir, "./events"));
-        this.logger = createLogger({
-            format: format.combine(
-                format.timestamp(),
-                format.json()
-            ),
-            transports: [
-                new transports.File({ filename: "combined.log" })
-            ]
-        });
+        this.apiKey = options.apiKey;
+        this.commands = new CommandManager(this, resolve(options.baseDir, "./commands"));
+        this.events = new EventManager(this, resolve(options.baseDir, "./events"));
+        this.logger = createLogger(options.loggerOptions);
     }
 
     /**
@@ -61,16 +54,17 @@ export class AzuriaClient extends Client {
      * @public
      * @returns {Promise<void>}
      */
-    public async start(): Promise<void> {
+    public async start(token: string): Promise<void> {
         this.events.load();
-        this.login(process.env.TOKEN)
-        .then(async () => {
-            this.logger.info("Logged in successfully.");
 
-            await this.config.load();
-            await this.commands.load();
-        })
-        .catch((error) => this.logger.error("CLIENT_START_ERR:", error))
-        .finally(() => this.logger.info("Client started."));
+        this.login(token)
+            .then(async () => {
+                this.logger.info("Logged in successfully.");
+
+                await this.config.load();
+                await this.commands.load();
+            })
+            .catch((error) => this.logger.error("CLIENT_START_ERR:", error))
+            .finally(() => this.logger.info("Client started."));
     };
 }
