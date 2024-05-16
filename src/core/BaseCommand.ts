@@ -18,7 +18,7 @@ import { ICommand } from "./interfaces";
  * @class
  * @implements {ICommand}
  */
-export abstract class BaseCommand<T> implements ICommand<T> {
+export abstract class BaseCommand<T = any> implements ICommand<T> {
     public readonly client: AzuriaClient<T>;
     public readonly data: ApplicationCommandData;
 

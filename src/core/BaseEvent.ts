@@ -16,7 +16,7 @@ import { IEvent } from "./interfaces/";
  * @class
  * @implements {IEvent}
  */
-export abstract class BaseEvent<T> implements IEvent<T> {
+export abstract class BaseEvent<T = any> implements IEvent<T> {
     public readonly client: AzuriaClient<T>;
     public readonly name: IEvent<T>["name"];
 
