@@ -72,7 +72,8 @@ export class ConfigManager<T> extends Collection<Snowflake, T> {
         this.client.logger.info("Fetching config...");
 
         try {
-            const response = await axios.get(`https://www.api.belogia.fr/api/v1/bots/${this.client.user?.id}/configs`, {
+            // Replace { guild: Snowflake, config: T }[] to belogia-api-types lib type
+            const response = await axios.get<{ guild: Snowflake, config: T }[]>(`https://www.api.belogia.fr/api/v1/bots/${this.client.user?.id}/configs`, {
                 headers: {
                     Authorization: `Bearer ${this.client.apiKey}`,
                     "Accept-Encoding": "application/x-www-form-urlencoded",
@@ -80,9 +81,11 @@ export class ConfigManager<T> extends Collection<Snowflake, T> {
                 }
             });
 
-            response.data.forEach((config: { guild: Snowflake, guildConfig: T }) => {
-                this.set(config.guild, config.guildConfig);
-            });
+            Promise.all(
+                response.data.map(async (data) => {
+                    this.set(data.guild, data.config);
+                })
+            );
 
             this.client.logger.info("Config fetched !");
         } catch (error) {
