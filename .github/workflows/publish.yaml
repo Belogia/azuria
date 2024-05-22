@@ -23,10 +23,10 @@ jobs:
             - name: Install dependencies and build 🔧
               run: yarn install --frozen-lockfile && yarn build
 
-            - name: Publish package on NPM 📦
-              run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc && yarn publish
-              env:
-                NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+            # - name: Publish package on NPM 📦
+            #   run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc && yarn publish
+            #   env:
+            #     NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
             - name: Publish package on GitHub Packages 📦
               run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" > ~/.npmrc && yarn publish
