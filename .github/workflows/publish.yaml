@@ -19,9 +19,9 @@ jobs:
                   registry-url: 'https://npm.pkg.github.com'
 
             - name: Install dependencies and build 🔧
-              run: npm ci && npm run build
+              run: yarn install --frozen-lockfile && yarn build
 
             - name: Publish package on NPM 📦
-              run: npm publish
+              run: yarn publish
               env:
                 NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
