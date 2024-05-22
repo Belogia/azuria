@@ -24,4 +24,4 @@ jobs:
             - name: "Publish"
               run: yarn publish
               env:
-                  NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+                npm_config_//npm.pkg.github.com/:_authToken: ${{secrets.GITHUB_TOKEN}}
