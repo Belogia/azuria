@@ -17,11 +17,13 @@ jobs:
               with:
                   node-version: '18'
                   registry-url: 'https://npm.pkg.github.com'
+                  always-auth: true
+
 
             - name: Install dependencies and build 🔧
               run: yarn install --frozen-lockfile && yarn build
 
             - name: Publish package on NPM 📦
-              run: yarn publish
+              run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc && yarn publish
               env:
                 NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
