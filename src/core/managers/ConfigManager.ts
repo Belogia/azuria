@@ -26,7 +26,11 @@ export class ConfigManager<T> extends Collection<Snowflake, T> {
         super();
 
         this.client = client;
-        this.socket = io(""); // todo
+        this.socket = io("https://www.api.belogia.fr", {
+            auth: {
+                token: this.client.apiKey
+            }
+        });
     }
 
     /**
@@ -43,7 +47,7 @@ export class ConfigManager<T> extends Collection<Snowflake, T> {
         this.client.logger.info("Loading config...");
 
         if (this.client.user) {
-            this.socket.on(`configUpdated:${this.client.user.id}`, () => {
+            this.socket.on(`configUpdate:${this.client.user.id}`, () => {
                 this.client.logger.info("New config received !");
 
                 this.fetchConfig();
