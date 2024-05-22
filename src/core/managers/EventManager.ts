@@ -1,9 +1,10 @@
-
 import { readdir } from "fs/promises";
-import { AzuriaClient } from "../AzuriaClient";
-import { resolve } from "path";
-import { IEvent } from "../interfaces/IEvent";
 import { pathToFileURL } from "url";
+import { Guild } from "discord.js";
+import { resolve } from "path";
+import axios from "axios";
+import { AzuriaClient } from "../AzuriaClient";
+import { IEvent } from "../interfaces/IEvent";
 
 /**
  * `EventManager` is a class responsible for loading and managing event files for the `AzuriaClient` client.
@@ -47,8 +48,46 @@ export class EventManager<T> {
                     this.client.logger.info(`Events on listener ${event.name} has been added.`);
                     this.client.on(event.name, (...args) => event.execute(...args));
                 }
+
+                this.loadDefaultEvents();
             })
             .catch((error) => this.client.logger.error("EVENTS_LOADER_ERR:", error))
             .finally(() => this.client.logger.info("Done loading events."));
+    }
+
+    private loadDefaultEvents(): void {
+        let listener = (...args: any[]) => { };
+
+        this.client.logger.info("Loading default events...");
+
+        if (this.client.eventNames().includes("guildCreate")) {
+            listener = this.client.listeners("guildCreate")[0] as (...args: any[]) => void;
+            this.client.removeListener("guildCreate", listener);
+        }
+
+        this.client.on("guildCreate", async (...args: any[]) => {
+            const guild = args[0] as Guild;
+
+            this.client.logger.info(`Registering guild ${guild.name} (${guild.id}) to the API...`);
+
+            axios.post(`http://localhost:3000/api/v1/bots/${guild.client.user.id}/guilds/add`,
+                {
+                    id: guild.id,
+                    name: guild.name,
+                    icon: guild.icon
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${this.client.apiKey}`,
+                        "Accept-Encoding": "application/x-www-form-urlencoded",
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    }
+                }
+            )
+
+            this.client.logger.info(`Guild ${guild.name} (${guild.id}) has been registered to the API.`);
+
+            listener(...args);
+        });
     }
 }
