@@ -1,9 +1,8 @@
 import { ApplicationCommandData, Collection } from "discord.js";
+import { pathToFileURL } from "url";
 import { readdir } from "fs/promises";
 import { resolve } from "path";
-import { AzuriaClient } from "../AzuriaClient";
-import { ICommand } from "../interfaces";
-import { pathToFileURL } from "url";
+import { AzuriaClient, ICommand } from "@/core";
 
 /**
  * `CommandManager` is a class responsible for loading and managing command files for the `AzuriaClient` client.
@@ -46,22 +45,25 @@ export class CommandManager<T> extends Collection<string, ICommand<T>> {
 
         this.client.logger.info(`Found ${categories.length} categories, registering...`);
 
-        for (const category of categories) {
-            const files = await readdir(resolve(this.path, category));
+        await Promise.all(categories.map(async (category: string) => {
+            const files: string[] = await readdir(resolve(this.path, category));
 
             this.client.logger.info(`Found ${files.length} of commands in ${category}, loading...`);
 
-            for (const file of files) {
+            const commandPromises = files.map(async (file) => {
                 const path = pathToFileURL(resolve(this.path, category, file)).href;
                 const command = await this.client.utils.import<ICommand<T>>(path, this.client);
 
                 if (command === undefined) throw new Error(`File ${file} is not a valid command file.`);
 
-                this.set(command.data.name, command);
+                const commandDataArray = Array.isArray(command.data) ? command.data : [command.data];
 
-                await this.register(command.data);
-            }
-        }
+                await Promise.all(commandDataArray.map(data => this.register(data)));
+                this.set(commandDataArray[0].name, command);
+            });
+
+            await Promise.all(commandPromises);
+        }));
     }
 
     /**

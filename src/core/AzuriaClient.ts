@@ -1,9 +1,10 @@
-import { Client } from "discord.js";
 import { createLogger, Logger } from "winston";
+import { Client } from "discord.js";
 import { resolve } from "path";
-import { IAzuriaClientOptions } from "./interfaces/";
-import { CommandManager, ConfigManager, EventManager } from "./managers";
-import { ClientUtils } from "../utils/ClientUtils";
+import { CommandManager, EventManager } from "@/core";
+import { IAzuriaClientOptions } from "@/core/interfaces";
+import { ConfigManager } from "@/core/managers";
+import { ClientUtils } from "@/utils/ClientUtils";
 
 /**
  * `AzuriaClient` is a class that extends the `Client` class from `discord.js`.

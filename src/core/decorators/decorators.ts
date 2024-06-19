@@ -1,4 +1,4 @@
-import { ApplicationCommandData } from "discord.js";
+import { CommandData } from "@/types";
 
 /**
  * `BaseDecorator` is a class decorator factory that takes any data as a parameter.
@@ -35,7 +35,7 @@ export function BaseDecorator(data: any) {
  *
  * @returns A class decorator that modifies the class constructor.
  */
-export const Command = (data: ApplicationCommandData) => BaseDecorator(data);
+export const Command = (data: CommandData) => BaseDecorator(data);
 
 /**
  * `Event` is a function that takes a string `name` and returns a class decorator.
