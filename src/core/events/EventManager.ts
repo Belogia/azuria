@@ -48,7 +48,7 @@ export class EventManager<T> {
 
         this.client.logger.info(`Loading ${events.length} default events...`);
 
-        Promise.all(
+        await Promise.all(
             events.map(async (event: EventWithoutClient) => {
                 this.client.on(event.name, async (...args: any[]) => await event.execute(this.client, ...args));
                 this.client.logger.info(`Events on listener ${event.name} has been added.`);
@@ -66,7 +66,7 @@ export class EventManager<T> {
 
         this.client.logger.info(`Loading ${files.length} events...`);
 
-        Promise.all(files.map(async (file: string) => {
+        await Promise.all(files.map(async (file: string) => {
             const event = await this.client.utils.import<IEvent<T>>(
                 pathToFileURL(
                     resolve(this.path, file)
@@ -80,8 +80,8 @@ export class EventManager<T> {
             if (this.client.eventNames().includes(event.name))
                 this.wrapper.wrap(event.name, event.execute);
             else
-                this.client.on(event.name, event.execute);
-            
+                this.client.on(event.name, (...args: any[]) => event.execute(...args));
+
             this.client.logger.info(`Events on listener ${event.name} has been added.`);
         }));
 
