@@ -1,5 +1,4 @@
-import { AzuriaClient } from "./AzuriaClient";
-import { IEvent } from "./interfaces/";
+import { AzuriaClient, IEvent } from "@/core";
 
 /**
  * `BaseEvent` is an abstract class that implements the `IEvent` interface.

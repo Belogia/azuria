@@ -1,3 +1,3 @@
 export * from "./CommandManager";
 export * from "./ConfigManager";
-export * from "./EventManager";
+export * from "../events/EventManager";

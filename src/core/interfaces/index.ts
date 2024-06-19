@@ -1,3 +1,3 @@
 export * from "./IAzuriaClientOptions";
 export * from "./ICommand";
-export * from "./IEvent";
+export * from "../events/interfaces/IEvent";
