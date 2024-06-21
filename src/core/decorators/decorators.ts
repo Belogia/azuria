@@ -1,3 +1,4 @@
+import { ClientEvents } from "discord.js";
 import { CommandData } from "@/types";
 
 /**
@@ -45,4 +46,4 @@ export const Command = (data: CommandData) => BaseDecorator(data);
  *
  * @returns A class decorator that modifies the class constructor.
  */
-export const Event = (name: string) => BaseDecorator(name);
+export const Event = (name: keyof ClientEvents) => BaseDecorator(name);
