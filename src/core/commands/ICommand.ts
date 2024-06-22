@@ -1,10 +1,10 @@
 import { AzuriaClient } from "@/core";
-import { CommandData } from "@/types";
+import { CommandData, CommandListener } from "@/types";
 
 export interface ICommand<T> {
     readonly client: AzuriaClient<T>;
     readonly data: CommandData;
     readonly ephemeral?: boolean;
     readonly modal?: boolean;
-    execute(...args: any): void;
+    execute: CommandListener;
 }

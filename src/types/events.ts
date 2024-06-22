@@ -1,5 +1,6 @@
-import { IEvent } from "@/core/interfaces";
+import { IEvent } from "@/core";
+import { Listener } from "@/types";
 
-export type EventListener = (...args: any[]) => Promise<void>;
+export type EventListener = Listener;
 export type EventWithoutClient = Omit<IEvent<any>, "client">;
 export type EventRegistry = Record<string, EventWithoutClient>;
