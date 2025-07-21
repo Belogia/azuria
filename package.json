@@ -29,7 +29,7 @@
     "@types/node": "^22.7.7",
     "ts-node": "^10.9.2",
     "tsup": "^8.2.1",
-    "typescript": "^5.4.5"
+    "typescript": "^5.8.3"
   },
   "resolutions": {
     "strip-ansi": "^6.0.1",
